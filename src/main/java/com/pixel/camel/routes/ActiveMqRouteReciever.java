@@ -1,21 +1,23 @@
 package com.pixel.camel.routes;
 
+import com.pixel.camel.processor.DATFileProcessor;
+import com.pixel.model.JournalEntryBulkCreateRequest;
+import com.pixel.service.SoupEnvelopeCreatorService;
 import org.apache.camel.builder.RouteBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ActiveMqRouteReciever extends RouteBuilder {
 
+
+
+	@Autowired
+	private DATFileProcessor datFileProcessor;
 	@Override
 	public void configure() throws Exception {
+		from("file://source?delay=100000").process(datFileProcessor).to("file://destination?fileName=soap.xml");
 
-		restConfiguration().host("https://stage-api.legalselfrep.com");
-		//from("activemq:my-activemq-queue")
-       // .to("log: recieved message from queue");
-		from("timer: rest-api-consumer?period=5000")
-		.log("${body}")
-		.to("rest:get:/v1/customer/getcourts")
-		.log("${body}");
 	}
 
 }
